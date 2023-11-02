@@ -60,12 +60,16 @@ public class GrabbyMechanism extends SubsystemBase {
         return run(() -> m_rightYoshiInfeed.set(ControlMode.PercentOutput, -0.5));
     }
 
-    public void runSwitchBladeForward() {
-        m_leftSwitchBlade.set(ControlMode.PercentOutput, 0.5);
-        m_rightSwitchBlade.set(ControlMode.PercentOutput, 0.5);
+    public Command runSwitchBladeForward() {
+        return run(() -> m_rightSwitchBlade.set(ControlMode.PercentOutput, 0.5));
+    
     }
-    public void stopSwitchBlade() {
-        m_rightSwitchBlade.set(ControlMode.PercentOutput, 0);
+    public Command stopSwitchBlade() {
+        return run(() -> m_rightSwitchBlade.set(ControlMode.PercentOutput, 0));
+    }
+
+    public Command runSwitchBladeBackward() {
+        return run(() -> m_rightSwitchBlade.set(ControlMode.PercentOutput, -0.5));
     }
     
 }

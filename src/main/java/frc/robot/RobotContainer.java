@@ -67,7 +67,8 @@ public class RobotContainer {
 
         m_driverController.leftTrigger().onTrue(m_grabbyThingy.runInFeed()).onFalse(m_grabbyThingy.stopInFeed());
         m_driverController.rightBumper().onTrue(m_grabbyThingy.runOutFeed()).onFalse(m_grabbyThingy.stopInFeed());
-  m_driverController.a().onTrue(m_grabbyThingy.runSwitchBladeForward()).onFalse(m_grabbyThingy.stopSwitchBlade);      
+        m_driverController.a().onTrue(m_grabbyThingy.runSwitchBladeForward()).onFalse(m_grabbyThingy.stopSwitchBlade());
+        m_driverController.b().onTrue(m_grabbyThingy.runSwitchBladeBackward()).onFalse(m_grabbyThingy.stopSwitchBlade());
 
         
 
