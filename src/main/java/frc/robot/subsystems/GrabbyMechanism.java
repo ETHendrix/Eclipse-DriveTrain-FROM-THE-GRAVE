@@ -37,7 +37,6 @@ public class GrabbyMechanism extends SubsystemBase {
         m_rightSwitchBlade = new TalonSRX(6);
 
         m_leftSwitchBlade.follow(m_rightSwitchBlade);
-
     }
 
     public static GrabbyMechanism getInstance() {
