@@ -37,6 +37,8 @@ public class GrabbyMechanism extends SubsystemBase {
         m_rightSwitchBlade = new TalonSRX(6);
 
         m_leftSwitchBlade.follow(m_rightSwitchBlade);
+
+        m_rightSwitchBlade.setInverted(true);
     }
 
     public static GrabbyMechanism getInstance() {
@@ -61,7 +63,7 @@ public class GrabbyMechanism extends SubsystemBase {
     }
 
     public Command runSwitchBladeForward() {
-        return run(() -> m_rightSwitchBlade.set(ControlMode.PercentOutput, 0.5));
+        return run(() -> m_rightSwitchBlade.set(ControlMode.PercentOutput, 0.2));
     
     }
     public Command stopSwitchBlade() {
@@ -69,7 +71,7 @@ public class GrabbyMechanism extends SubsystemBase {
     }
 
     public Command runSwitchBladeBackward() {
-        return run(() -> m_rightSwitchBlade.set(ControlMode.PercentOutput, -0.5));
+        return run(() -> m_rightSwitchBlade.set(ControlMode.PercentOutput, -0.2));
     }
     
 }
