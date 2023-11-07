@@ -4,12 +4,12 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.GrabbyMechanism;
+import frc.robot.subsystems.Yoshi;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public final class Autos {
   /** Example static factory for an autonomous command. */
-  public static CommandBase exampleAuto(GrabbyMechanism subsystem) {
+  public static CommandBase exampleAuto(Yoshi subsystem) {
     return null;
     //Commands.sequence(subsystem.RunInFeed(), new Infeed());
   }

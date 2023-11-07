@@ -8,7 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 
 //import frc.robot.commands.ExampleCommand;
 
-import frc.robot.subsystems.GrabbyMechanism;
+import frc.robot.subsystems.Yoshi;
 
 //import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 //import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -30,11 +30,11 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Drivetrain m_drive = Drivetrain.getInstance();
-  private final GrabbyMechanism m_grabbyThingy = GrabbyMechanism.getInstance();
+  private final Yoshi m_yoshi = Yoshi.getInstance();
+  private final Carriage m_carriage = Carriage.getInstance();
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
-  
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -60,21 +60,24 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-  //Left Triggger HAS to be Infeed (Gabe's law of Eclipsedynamics)
-  //Right Trigger HAS to be speedy go fast button (Everybody's law of zoomyrobo-dynamics)
-  
-  //Right Bumper is Outfeed (Eric and Zeke's choice)
+    // Left Triggger HAS to be Infeed (Gabe's law of Eclipsedynamics)
+    // Right Trigger HAS to be speedy go fast button (Everybody's law of
+    // zoomyrobo-dynamics)
 
-        m_driverController.leftTrigger().onTrue(m_grabbyThingy.runInFeed()).onFalse(m_grabbyThingy.stopInFeed());
-        m_driverController.rightBumper().onTrue(m_grabbyThingy.runOutFeed()).onFalse(m_grabbyThingy.stopInFeed());
-        m_driverController.a().onTrue(m_grabbyThingy.runSwitchBladeForward()).onFalse(m_grabbyThingy.stopSwitchBlade());
-        m_driverController.b().onTrue(m_grabbyThingy.runSwitchBladeBackward()).onFalse(m_grabbyThingy.stopSwitchBlade());
+    // Right Bumper is Outfeed (Eric and Zeke's choice)
 
-        
+    m_driverController.leftTrigger().onTrue(m_yoshi.runInFeed()).onFalse(m_yoshi.stopInFeed());
+    m_driverController.rightBumper().onTrue(m_yoshi.runOutFeed()).onFalse(m_yoshi.stopInFeed());
+    m_driverController.y().onTrue(m_yoshi.runSwitchBladeForward()).onFalse(m_yoshi.stopSwitchBlade());
+    m_driverController.x()
+        .onTrue(m_yoshi.runSwitchBladeBackward().until(m_yoshi.supplier())).onFalse(m_yoshi.stopSwitchBlade());
+    m_driverController.leftTrigger().onTrue(m_carriage.runCarriageIn()).onFalse(m_carriage.stopCarriage());
+    m_driverController.rightBumper().onTrue(m_carriage.runCarriageOut()).onFalse(m_carriage.stopCarriage());
 
-        m_drive.setDefaultCommand(
-          //Get Joystick Axis for Left and Right Sticks (This is in terms of Arcade drive)
-            m_drive.driverobot(() -> -m_driverController.getLeftY(), () -> m_driverController.getRightX()));
+    m_drive.setDefaultCommand(
+        // Get Joystick Axis for Left and Right Sticks (This is in terms of Arcade
+        // drive)
+        m_drive.driverobot(() -> -m_driverController.getLeftY(), () -> m_driverController.getRightX()));
   }
 
   /**
