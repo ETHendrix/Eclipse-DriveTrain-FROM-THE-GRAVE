@@ -32,6 +32,7 @@ public class RobotContainer {
   private final Drivetrain m_drive = Drivetrain.getInstance();
   private final Yoshi m_yoshi = Yoshi.getInstance();
   private final Carriage m_carriage = Carriage.getInstance();
+  private final ElevatorLift m_elevator = ElevatorLift.getInstance();
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
@@ -68,11 +69,15 @@ public class RobotContainer {
 
     m_driverController.leftTrigger().onTrue(m_yoshi.runInFeed()).onFalse(m_yoshi.stopInFeed());
     m_driverController.rightBumper().onTrue(m_yoshi.runOutFeed()).onFalse(m_yoshi.stopInFeed());
+
     m_driverController.y().onTrue(m_yoshi.runSwitchBladeForward()).onFalse(m_yoshi.stopSwitchBlade());
-    m_driverController.x()
-        .onTrue(m_yoshi.runSwitchBladeBackward().until(m_yoshi.supplier())).onFalse(m_yoshi.stopSwitchBlade());
+    m_driverController.x().onTrue(m_yoshi.runSwitchBladeBackward().until(m_yoshi.supplier()))
+        .onFalse(m_yoshi.stopSwitchBlade());
+
     m_driverController.leftTrigger().onTrue(m_carriage.runCarriageIn()).onFalse(m_carriage.stopCarriage());
     m_driverController.rightBumper().onTrue(m_carriage.runCarriageOut()).onFalse(m_carriage.stopCarriage());
+
+    m_driverController.b().onTrue(m_elevator.runElevatorUp()).onFalse(m_elevator.stopElevator());
 
     m_drive.setDefaultCommand(
         // Get Joystick Axis for Left and Right Sticks (This is in terms of Arcade
