@@ -11,6 +11,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -28,7 +29,8 @@ public class Drivetrain extends SubsystemBase {
 
     private AHRS m_gyro;
 
-    private static final double CODES_PER_REV = 30725.425;
+    private static final double TICKS_PER_REV = 4096;
+    private static final double GEAR_RATIO = 7.5;
     private static final double ENCODER_ROTATIONS_PER_DEGREE = 46.15 / 3600;
     private static final double INCHES_PER_METER = 0.0254;
     private DifferentialDriveOdometry m_odometry;
@@ -42,6 +44,9 @@ public class Drivetrain extends SubsystemBase {
 
         m_leftMaster.setSensorPhase(true);
         m_leftSlave.setSensorPhase(true);
+
+        m_leftMaster.setSelectedSensorPosition(0);
+        m_rightMaster.setSelectedSensorPosition(0);
 
         m_leftMaster.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 0.1));
         m_leftSlave.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 0.1));
@@ -57,12 +62,11 @@ public class Drivetrain extends SubsystemBase {
 
         m_gyro = new AHRS(Port.kMXP);
         m_pose = new Pose2d();
-        
 
         configMasterMotors(m_leftMaster);
         configMasterMotors(m_rightMaster);
 
-            m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d(),
+        m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d(),
                 m_leftMaster.getSelectedSensorPosition(),
                 m_rightMaster.getSelectedSensorPosition(),
                 new Pose2d(0, 0, new Rotation2d()));
@@ -73,13 +77,13 @@ public class Drivetrain extends SubsystemBase {
         m_talon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 0);
     }
 
-    private static int MetersToNativeUnits(double positionInMeters) {
-        int nativeUnits = (int) ((positionInMeters * CODES_PER_REV / (6 * Math.PI)) / INCHES_PER_METER);
+    private static int metersToNativeUnits(double positionInMeters) {
+        int nativeUnits = (int) ((positionInMeters * (GEAR_RATIO * TICKS_PER_REV) / (6 * Math.PI)) / INCHES_PER_METER);
         return nativeUnits;
     }
 
     private static double nativeUnitsToMeters(double nativeUnitsMeasure) {
-        double positionInMeters = (nativeUnitsMeasure / CODES_PER_REV * 6 * Math.PI) * INCHES_PER_METER;
+        double positionInMeters = (nativeUnitsMeasure / (GEAR_RATIO * TICKS_PER_REV) * 6 * Math.PI) * INCHES_PER_METER;
         return positionInMeters;
     }
 
@@ -89,21 +93,50 @@ public class Drivetrain extends SubsystemBase {
 
     public Command driverobot(DoubleSupplier stickInputY, DoubleSupplier stickInputX) {
         return run(() -> m_drive.arcadeDrive(stickInputY.getAsDouble(), -stickInputX.getAsDouble()));
+    }
 
+    public Pose2d getPose2d() {
+        return m_odometry.getPoseMeters();
+    }
+
+    public double getHeading() {
+        return m_gyro.getRotation2d().getDegrees();
+    }
+
+    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+        return new DifferentialDriveWheelSpeeds(nativeUnitsToMeters(m_leftMaster.getSelectedSensorVelocity()) * 10.0,
+                nativeUnitsToMeters(m_rightMaster.getSelectedSensorVelocity()) * 10.0);
+    }
+
+    public void resetOdometry(Pose2d pose) {
+
+        m_odometry.resetPosition(m_gyro.getRotation2d(), m_leftMaster.getSelectedSensorPosition(),
+                m_rightMaster.getSelectedSensorPosition(), pose);
+
+    }
+
+    public void zeroHeading() {
+        m_gyro.reset();
+    }
+
+    public void tankDriveVolts(double leftVolts, double rightVolts) {
+        m_leftGroup.setVoltage(leftVolts);
+        m_rightGroup.setVoltage(rightVolts);
+        m_drive.feed();
     }
 
     @Override
     public void periodic() {
         var gyroAngle = m_gyro.getRotation2d();
-        m_pose = m_odometry.update(gyroAngle, m_leftMaster.getSelectedSensorPosition(),
-                m_rightMaster.getSelectedSensorPosition());
+        m_pose = m_odometry.update(gyroAngle, nativeUnitsToMeters(m_leftMaster.getSelectedSensorPosition()),
+                nativeUnitsToMeters(m_rightMaster.getSelectedSensorPosition()));
 
         SmartDashboard.putNumber("Left Encoder pos", nativeUnitsToMeters(m_leftMaster.getSelectedSensorPosition()));
         SmartDashboard.putNumber("Right Encoder pos", nativeUnitsToMeters(m_rightMaster.getSelectedSensorPosition()));
 
-        SmartDashboard.putNumber("Position X", nativeUnitsToMeters(m_pose.getX()));
-        SmartDashboard.putNumber("Position Y", nativeUnitsToMeters(m_pose.getY()));
-       // SmartDashboard.putNumber("Rotation", m_pose.ge);
+        SmartDashboard.putNumber("Position X", m_pose.getX());
+        SmartDashboard.putNumber("Position Y", m_pose.getY());
+        // SmartDashboard.putNumber("Rotation", m_pose.ge);
     }
     // public Command runInfeed() {
     // return run()
