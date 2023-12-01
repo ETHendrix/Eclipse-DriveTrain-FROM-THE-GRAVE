@@ -71,7 +71,7 @@ public class Yoshi extends SubsystemBase {
     }
 
     public BooleanSupplier supplier() {
-        return () -> m_rightSwitchBlade.isRevLimitSwitchClosed() == 0;
+        return () -> m_rightSwitchBlade.isRevLimitSwitchClosed() == 1;
     }
 
    

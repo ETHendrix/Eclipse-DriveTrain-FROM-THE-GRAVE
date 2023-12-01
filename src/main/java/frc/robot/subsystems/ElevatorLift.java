@@ -55,9 +55,18 @@ public class ElevatorLift extends SubsystemBase {
     return run(() -> m_elevatorMotor.set(ControlMode.PercentOutput, 0));
   }
 
-  public Command elevatorRunToPositionCommand() {
+  public Command elevatorRunToPositionCommand20() {
     return run(() -> elevatorRunToPosition(20));
   }
+
+  public Command elevatorRunToPositionCommand40() {
+    return run(() -> elevatorRunToPosition(40));
+  }
+  
+  public Command elevatorRunToPositionCommand60() {
+    return run(() -> elevatorRunToPosition(60));
+  }
+
   
   public void elevatorRunToPosition(double positionInInches) {
     m_elevatorMotor.set(ControlMode.MotionMagic, inchesToNativeUnits(positionInInches));

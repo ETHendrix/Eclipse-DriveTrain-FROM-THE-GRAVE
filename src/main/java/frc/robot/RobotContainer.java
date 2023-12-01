@@ -51,6 +51,8 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController m_operatorController = new CommandXboxController(
+    OperatorConstants.kOperatorControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -82,18 +84,25 @@ public class RobotContainer {
 
     // Right Bumper is Outfeed (Eric and Zeke's choice)
 
-    m_driverController.leftTrigger().onTrue(m_yoshi.runInFeed()).onFalse(m_yoshi.stopInFeed());
-    m_driverController.rightBumper().onTrue(m_yoshi.runOutFeed()).onFalse(m_yoshi.stopInFeed());
+  
 
     m_driverController.y().onTrue(m_yoshi.runSwitchBladeForward()).onFalse(m_yoshi.stopSwitchBlade());
     m_driverController.x().onTrue(m_yoshi.runSwitchBladeBackward().until(m_yoshi.supplier()))
         .onFalse(m_yoshi.stopSwitchBlade());
 
-    m_driverController.leftTrigger().onTrue(m_carriage.runCarriageIn()).onFalse(m_carriage.stopCarriage());
+    m_driverController.leftBumper().onTrue(m_carriage.runCarriageIn()).onFalse(m_carriage.stopCarriage());
+    m_driverController.leftBumper().onTrue(m_yoshi.runInFeed()).onFalse(m_yoshi.stopInFeed());
+    
     m_driverController.rightBumper().onTrue(m_carriage.runCarriageOut()).onFalse(m_carriage.stopCarriage());
+    m_driverController.rightBumper().onTrue(m_yoshi.runOutFeed()).onFalse(m_yoshi.stopInFeed());
 
-    m_driverController.b().onTrue(m_elevator.runElevatorUp()).onFalse(m_elevator.stopElevator());
-    m_driverController.a().onTrue(m_elevator.elevatorRunToPositionCommand());
+    
+
+    m_operatorController.x().onTrue(m_elevator.stopElevator());
+    m_operatorController.y().onTrue(m_elevator.elevatorRunToPositionCommand60());
+    m_operatorController.b().onTrue(m_elevator.elevatorRunToPositionCommand40());
+    m_operatorController.a().onTrue(m_elevator.elevatorRunToPositionCommand20());
+
 
     m_drive.setDefaultCommand(
         // Get Joystick Axis for Left and Right Sticks (This is in terms of Arcade

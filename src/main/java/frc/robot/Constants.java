@@ -22,6 +22,7 @@ public final class Constants {
   public static class OperatorConstants {
 
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
 
   }
 
@@ -42,6 +43,7 @@ public final class Constants {
 
     public static final double kRamseteB = 2;
     public static final double kRamseteZeta = 0.7;
-
+    
+    public static final int CARRIAGE_LIMIT_SWITCH_DIO_PORT = 0;
   }
 }
