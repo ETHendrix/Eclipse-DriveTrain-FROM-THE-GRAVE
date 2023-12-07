@@ -64,8 +64,6 @@ public class Carriage extends SubsystemBase {
   
   public BooleanSupplier isCubeInSupplier() {
     return m_carriageLimitSwitch::get;
-    
-    
   
 } 
 
@@ -73,6 +71,8 @@ public class Carriage extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Is Cube In?", isCubeInSupplier().getAsBoolean());
-  }
+    
+    }
+
 
 }
