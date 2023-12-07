@@ -36,6 +36,7 @@ public class Drivetrain extends SubsystemBase {
     private DifferentialDriveOdometry m_odometry;
     private Pose2d m_pose;
 
+    
     public Drivetrain() {
         m_leftMaster = new WPI_TalonSRX(1);
         m_leftSlave = new WPI_TalonSRX(2);
@@ -136,6 +137,9 @@ public class Drivetrain extends SubsystemBase {
 
         SmartDashboard.putNumber("Position X", m_pose.getX());
         SmartDashboard.putNumber("Position Y", m_pose.getY());
+        m_drive.feed();
+
         // SmartDashboard.putNumber("Rotation", m_pose.ge);
     }
+
 }

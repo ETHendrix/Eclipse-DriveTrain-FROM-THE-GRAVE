@@ -23,6 +23,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 //import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -48,11 +50,12 @@ public class RobotContainer {
   private final Yoshi m_yoshi = Yoshi.getInstance();
   private final Carriage m_carriage = Carriage.getInstance();
   private final ElevatorLift m_elevator = ElevatorLift.getInstance();
+  private final SendableChooser<Command> m_autonChooser = new SendableChooser<>();
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
   private final CommandXboxController m_operatorController = new CommandXboxController(
-    OperatorConstants.kOperatorControllerPort);
+      OperatorConstants.kOperatorControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -60,7 +63,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-
+    configSendableChooser();
   }
 
   /**
@@ -77,6 +80,12 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
+
+    private void configSendableChooser() {
+      m_autonChooser.setDefaultOption("Defaut Auton", getAutonomousCommand());
+      SmartDashboard.putData("Auto Choices", m_autonChooser);
+    }
+
   private void configureBindings() {
     // Left Triggger HAS to be Infeed (Gabe's law of Eclipsedynamics)
     // Right Trigger HAS to be speedy go fast button (Everybody's law of
@@ -84,25 +93,21 @@ public class RobotContainer {
 
     // Right Bumper is Outfeed (Eric and Zeke's choice)
 
-  
-
     m_driverController.y().onTrue(m_yoshi.runSwitchBladeForward()).onFalse(m_yoshi.stopSwitchBlade());
     m_driverController.x().onTrue(m_yoshi.runSwitchBladeBackward().until(m_yoshi.supplier()))
         .onFalse(m_yoshi.stopSwitchBlade());
 
-    m_driverController.leftBumper().onTrue(m_carriage.runCarriageIn()).onFalse(m_carriage.stopCarriage());
+    m_driverController.leftBumper().onTrue(m_carriage.runCarriageIn().until(m_carriage.isCubeInSupplier()).andThen(m_carriage.stopCarriage())).onFalse(m_carriage.stopCarriage());
+
     m_driverController.leftBumper().onTrue(m_yoshi.runInFeed()).onFalse(m_yoshi.stopInFeed());
-    
+
     m_driverController.rightBumper().onTrue(m_carriage.runCarriageOut()).onFalse(m_carriage.stopCarriage());
     m_driverController.rightBumper().onTrue(m_yoshi.runOutFeed()).onFalse(m_yoshi.stopInFeed());
-
-    
 
     m_operatorController.x().onTrue(m_elevator.stopElevator());
     m_operatorController.y().onTrue(m_elevator.elevatorRunToPositionCommand60());
     m_operatorController.b().onTrue(m_elevator.elevatorRunToPositionCommand40());
     m_operatorController.a().onTrue(m_elevator.elevatorRunToPositionCommand20());
-
 
     m_drive.setDefaultCommand(
         // Get Joystick Axis for Left and Right Sticks (This is in terms of Arcade
@@ -133,25 +138,24 @@ public class RobotContainer {
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, new Rotation2d(0)),
         List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-        Pose2d(3, 0, new Rotation2d(0)),
+        new Pose2d(3, 0, new Rotation2d(0)),
         config);
     m_drive.resetOdometry(exampleTrajectory.getInitialPose());
 
     RamseteCommand ramseteCommand = new RamseteCommand(
-      exampleTrajectory,
-      m_drive::getPose2d,
-      new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
-      new SimpleMotorFeedforward(
-        AutoConstants.ksVolts,
-        AutoConstants.kvVoltSecondsPerMeter,
-        AutoConstants.kaVoltSecondsSquaredPerMeter
-      ), 
-      AutoConstants.kDriveKinematics,
-      m_drive::getWheelSpeeds,
-      new PIDController(AutoConstants.kPDriveVel, 0, 0),
-      new PIDController(AutoConstants.kPDriveVel, 0, 0),
-      m_drive::tankDriveVolts,
-      m_drive);
+        exampleTrajectory,
+        m_drive::getPose2d,
+        new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
+        new SimpleMotorFeedforward(
+            AutoConstants.ksVolts,
+            AutoConstants.kvVoltSecondsPerMeter,
+            AutoConstants.kaVoltSecondsSquaredPerMeter),
+        AutoConstants.kDriveKinematics,
+        m_drive::getWheelSpeeds,
+        new PIDController(AutoConstants.kPDriveVel, 0, 0),
+        new PIDController(AutoConstants.kPDriveVel, 0, 0),
+        m_drive::tankDriveVolts,
+        m_drive);
 
     return null;
 
