@@ -54,6 +54,9 @@ public class Drivetrain extends SubsystemBase {
         m_rightMaster.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 0.1));
         m_rightSlave.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 0.1));
 
+        m_leftSlave.follow(m_leftMaster);
+        m_rightSlave.follow(m_rightMaster);
+
         m_leftGroup = new MotorControllerGroup(m_leftMaster, m_leftSlave);
         m_rightGroup = new MotorControllerGroup(m_rightMaster, m_rightSlave);
 
