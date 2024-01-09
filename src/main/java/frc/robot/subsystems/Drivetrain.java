@@ -135,8 +135,8 @@ public class Drivetrain extends SubsystemBase {
         m_pose = m_odometry.update(gyroAngle, nativeUnitsToMeters(m_leftMaster.getSelectedSensorPosition()),
                 nativeUnitsToMeters(m_rightMaster.getSelectedSensorPosition()));
 
-        SmartDashboard.putNumber("Left Encoder pos", nativeUnitsToMeters(m_leftMaster.getSelectedSensorPosition()));
-        SmartDashboard.putNumber("Right Encoder pos", nativeUnitsToMeters(m_rightMaster.getSelectedSensorPosition()));
+        SmartDashboard.putNumber("Left Drivetrain Encoder pos", nativeUnitsToMeters(m_leftMaster.getSelectedSensorPosition()));
+        SmartDashboard.putNumber("Right Drivetrain Encoder pos", nativeUnitsToMeters(m_rightMaster.getSelectedSensorPosition()));
 
         SmartDashboard.putNumber("Position X", m_pose.getX());
         SmartDashboard.putNumber("Position Y", m_pose.getY());

@@ -97,6 +97,8 @@ public class RobotContainer {
     m_driverController.x().onTrue(m_yoshi.runSwitchBladeBackward().until(m_yoshi.supplier()))
         .onFalse(m_yoshi.stopSwitchBlade());
 
+    m_driverController.b().onTrue(m_yoshi.switchBladeRuntoAngleCommand180());
+
     m_driverController.leftBumper().onTrue(m_carriage.runCarriageIn().until(m_carriage.isCubeInSupplier()).andThen(m_carriage.stopCarriage())).onFalse(m_carriage.stopCarriage());
 
     m_driverController.leftBumper().onTrue(m_yoshi.runInFeed()).onFalse(m_yoshi.stopInFeed());

@@ -25,7 +25,7 @@ public class Yoshi extends SubsystemBase {
     private static Yoshi m_instance;
     private TalonSRX m_leftYoshiInfeed, m_rightYoshiInfeed, m_leftSwitchBlade, m_rightSwitchBlade;
 
-    public static final double NATIVE_UNITS_TO_DEGREES_CONVERSION = (4096 / 10);
+    public static final double NATIVE_UNITS_TO_DEGREES_CONVERSION = (360.0 / 4096.0); // (4096 / 10 / 360);
 
     public Yoshi() {
         // Declare the motors that are in the infeed
@@ -48,16 +48,17 @@ public class Yoshi extends SubsystemBase {
 
         m_rightSwitchBlade.setInverted(true);
 
+
         m_rightSwitchBlade.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-        m_rightSwitchBlade.setSensorPhase(true);
+        m_rightSwitchBlade.setSensorPhase(false);
         m_rightSwitchBlade.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, 0);
 
         m_rightSwitchBlade.configMotionCruiseVelocity(4000);
         m_rightSwitchBlade.configMotionAcceleration(4000);
 
-        m_rightSwitchBlade.config_kP(0, 0.1);
+        m_rightSwitchBlade.config_kP(0, 0.45);
         m_rightSwitchBlade.config_kI(0, 0);
-        m_rightSwitchBlade.config_kD(0, 0);
+        m_rightSwitchBlade.config_kD(0, 4.5);
         m_rightSwitchBlade.config_kF(0, 0);
     }
 
@@ -98,19 +99,27 @@ public class Yoshi extends SubsystemBase {
         return run(() -> m_rightSwitchBlade.set(ControlMode.PercentOutput, -0.2));
     }
 
+    public Command switchBladeRuntoAngleCommand180() {
+        return run(() -> runToAngle(190.0));
+    }
+
+    public void runToAngle(double targetAngle) {
+        m_rightSwitchBlade.set(ControlMode.MotionMagic, DegreesToNativeUnits(targetAngle));
+    }
+
     private static double nativeUnitsToDegrees(double nativeUnitsMeasure) {
-        double positionInDegrees = nativeUnitsMeasure / NATIVE_UNITS_TO_DEGREES_CONVERSION;
+        double positionInDegrees = nativeUnitsMeasure * NATIVE_UNITS_TO_DEGREES_CONVERSION;
         return positionInDegrees;
     }
 
-    public Command runToAngle(double targetAngle) {
-        return run(() -> m_rightSwitchBlade.set(ControlMode.MotionMagic, targetAngle));
+    private static int DegreesToNativeUnits(double positionInDegrees) {
+        int nativeUnits = (int) (positionInDegrees / NATIVE_UNITS_TO_DEGREES_CONVERSION);
+        return nativeUnits;
     }
 
     public double getCurrentRightInfeedPosition() {
         return m_rightSwitchBlade.getSelectedSensorPosition(0);
     }
-
 
     @Override
     public void periodic() {
@@ -120,11 +129,10 @@ public class Yoshi extends SubsystemBase {
         }
 
         if (m_rightSwitchBlade.getSensorCollection().isRevLimitSwitchClosed() == false) {
-            System.out.println("Switchblades are at home"); }
-    
+            System.out.println("Switchblades are at home");
+        }
 
-
-        SmartDashboard.putNumber("Right Yoshi encoder pos",nativeUnitsToDegrees(m_rightSwitchBlade.getSelectedSensorPosition()));
-    
+        SmartDashboard.putNumber("Right Yoshi encoder pos",
+                nativeUnitsToDegrees(m_rightSwitchBlade.getSelectedSensorPosition()));
     }
 }
